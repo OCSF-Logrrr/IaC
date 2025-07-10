@@ -57,7 +57,7 @@ resource "aws_instance" "db_server_instance" {
     instance_metadata_tags      = "disabled" #메타데이터에서 인스턴스 태그 접근 비활성화
   }
 
-  user_data = templatefile("${path.module}/user_data.tpl")
+  user_data = templatefile("${path.module}/user_data.tpl", {})
 }
 
 #인스턴스에 eip 연결

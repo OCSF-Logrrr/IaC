@@ -109,7 +109,7 @@ resource "aws_eip_association" "eip_assoc" {
 }
 
 #프라이빗 서브넷용 라우트 테이블 생성
-resource "aws_route_table" "private_route_table_01" {
+resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc.id  #VPC 선택
 
   route { #라우트 규칙 정의
@@ -131,7 +131,7 @@ resource "aws_route_table_association" "route_table_private_subnet_02" {
   subnet_id      = aws_subnet.private_subnet_02.id #두 번째 프라이빗 서브넷 선택
   route_table_id = aws_route_table.private_route_table.id #프라이빗 서브넷용 라우트 테이블에 연결
 }
-resource "aws_route_table_association" "route_table_private_subnet_02" {
+resource "aws_route_table_association" "route_table_private_subnet_03" {
   subnet_id      = aws_subnet.private_subnet_03.id #세 번째 프라이빗 서브넷 선택
   route_table_id = aws_route_table.private_route_table.id #프라이빗 서브넷용 라우트 테이블에 연결
 }
