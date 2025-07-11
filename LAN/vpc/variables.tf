@@ -52,7 +52,7 @@ variable "availability_zone_01" {
 
 variable "availability_zone_02" {
   type        = string
-  default     = "ap-northeast-2b"
+  default     = "ap-northeast-2a"
   description = "두 번째 가용영역"
 }
 
@@ -64,6 +64,6 @@ variable "availability_zone_03" {
 
 variable "availability_zone_04" {
   type        = string
-  default     = "ap-northeast-2d"
+  default     = "ap-northeast-2c"
   description = "네 번째 가용영역"
 }

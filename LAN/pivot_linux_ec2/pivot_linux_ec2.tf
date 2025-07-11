@@ -58,6 +58,10 @@ resource "aws_instance" "pivot_server_instance" {
   }
 
   user_data = templatefile("${path.module}/user_data.tpl", {})
+
+  tags = {
+    Name = "${var.project_name}-pivot-instance"
+  }
 }
 
 #인스턴스에 eip 연결

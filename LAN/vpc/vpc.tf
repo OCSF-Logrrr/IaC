@@ -112,14 +112,16 @@ resource "aws_eip_association" "eip_assoc" {
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc.id  #VPC 선택
 
-  route { #라우트 규칙 정의
-    cidr_block     = "0.0.0.0/0" #서브넷에서 나가는 모든 트래픽이
-    nat_gateway_id = aws_instance.nat_instance.id #nat instance를 통하도록 설정
-  }
-
   tags = {
     Name = "${var.project_name}-private-route" #라우트 테이블 이름 지정
   }
+}
+
+#NAT Instance과 라우트 테이블 연결
+resource "aws_route" "private_nat_route" {
+  route_table_id         = aws_route_table.private_route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = aws_instance.nat_instance.primary_network_interface_id
 }
 
 #프라이빗 서브넷과 라우트 테이블 연결

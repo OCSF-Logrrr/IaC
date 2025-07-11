@@ -16,6 +16,15 @@ resource "aws_vpc_security_group_ingress_rule" "window_in_all_rdp" {
   to_port           = "3389" #rdp 포트
 }
 
+#window server용 보안그룹 인바운드 규칙 생성 - ssh 허용
+resource "aws_vpc_security_group_ingress_rule" "window_in_all_ssh" {
+  security_group_id = aws_security_group.window_server_sg.id #보안 그룹 참조 (window server용 보안 그룹 참조)
+  cidr_ipv4         = "0.0.0.0/0" #모든 트래픽
+  from_port         = "22" #ssh 포트
+  ip_protocol       = "tcp" #tcp
+  to_port           = "22" #ssh 포트
+}
+
 #window server용 보안그룹 아웃바운드 규칙 생성 - 전체 허용
 resource "aws_vpc_security_group_egress_rule" "window_out_all" {
   security_group_id = aws_security_group.window_server_sg.id #보안 그룹 참조 (window server용 보안 그룹 참조)
@@ -30,14 +39,14 @@ resource "aws_eip" "window_server_eip" {
 
 #인스턴스 생성
 resource "aws_instance" "window_server_instance" {
-  ami                       = "" #ami 이름 (지역별로 고유) -> Window
+  ami                       = "ami-04bababf99bf7c0e5" #ami 이름 (지역별로 고유) -> Microsoft Windows Server 2022
   instance_type             = "t2.micro" #인스턴스 유형
   key_name                  = var.key_name #키페어 이름
   subnet_id                 = var.public_subnet_id_01 #퍼블릭 서브넷 id
   vpc_security_group_ids    = [aws_security_group.window_server_sg.id] #보안 그룹 id
 
   root_block_device { #스토리지
-    volume_size           = 8 #볼륨 크기
+    volume_size           = 30 #볼륨 크기
     volume_type           = "gp3" #볼륨 유형
     iops                  = 3000 #프로비저닝된 iops 값
     delete_on_termination = true #인스턴스 종료 시 삭제 여부
@@ -57,6 +66,10 @@ resource "aws_instance" "window_server_instance" {
   }
 
   user_data = templatefile("${path.module}/user_data.tpl", {})
+
+  tags = {
+    Name = "${var.project_name}-bastion-instance"
+  }
 }
 
 #인스턴스에 eip 연결

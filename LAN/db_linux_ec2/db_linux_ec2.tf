@@ -58,6 +58,10 @@ resource "aws_instance" "db_server_instance" {
   }
 
   user_data = templatefile("${path.module}/user_data.tpl", {})
+
+  tags = {
+    Name = "${var.project_name}-db-instance"
+  }
 }
 
 #인스턴스에 eip 연결
