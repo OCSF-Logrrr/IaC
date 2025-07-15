@@ -35,6 +35,22 @@ data "aws_iam_policy_document" "guardduty_s3" {
       values   = ["bucket-owner-full-control"]
     }
   }
+  
+  statement {
+    sid = "Allow GetBucketLocation"
+    actions = [
+      "s3:GetBucketLocation"
+    ]
+
+    resources = [
+      var.s3_bucket_arn
+    ]
+
+    principals {
+      type = "Service"
+      identifiers = ["guardduty.amazonaws.com"]
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "guardduty_result_bucket" {

@@ -21,7 +21,8 @@ resource "aws_kms_key" "guardduty" {
           "kms:Encrypt",
           "kms:Decrypt",
           "kms:ReEncrypt*",
-          "kms:DescribeKey"
+          "kms:DescribeKey",
+          "kms:CreateGrant"
         ],
         Resource = "*"
       },
