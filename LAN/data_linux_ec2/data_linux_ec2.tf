@@ -31,14 +31,14 @@ resource "aws_vpc_security_group_egress_rule" "data_out_all" {
 
 #인스턴스 생성
 resource "aws_instance" "data_server_instance" {
-  ami                       = "ami-0d5bb3742db8fc264" #ami 이름 (지역별로 고유) -> Ubuntu 24.04
+  ami                       = "ami-0f8d552e06067b477" #ami 이름 (지역별로 고유) -> Ubuntu 20.04
   instance_type             = "t2.micro" #인스턴스 유형
   key_name                  = var.key_name #키페어 이름
   subnet_id                 = var.private_subnet_id_02 #퍼블릭 서브넷 id
   vpc_security_group_ids    = [aws_security_group.data_server_sg.id] #보안 그룹 id
 
   root_block_device { #스토리지
-    volume_size           = 8 #볼륨 크기
+    volume_size           = 20 #볼륨 크기
     volume_type           = "gp3" #볼륨 유형
     iops                  = 3000 #프로비저닝된 iops 값
     delete_on_termination = true #인스턴스 종료 시 삭제 여부

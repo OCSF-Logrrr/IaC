@@ -31,7 +31,7 @@ resource "aws_vpc_security_group_egress_rule" "pivot_out_all" {
 
 #인스턴스 생성
 resource "aws_instance" "pivot_server_instance" {
-  ami                       = "ami-0d5bb3742db8fc264" #ami 이름 (지역별로 고유) -> Ubuntu 24.04
+  ami                       = "ami-0f8d552e06067b477" #ami 이름 (지역별로 고유) -> Ubuntu 20.04
   instance_type             = "t2.micro" #인스턴스 유형
   key_name                  = var.key_name #키페어 이름
   subnet_id                 = var.private_subnet_id_01 #프라이빗 서브넷 id
