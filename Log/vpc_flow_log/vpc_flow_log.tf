@@ -1,10 +1,11 @@
 #vpc_flow_log.tf
-# Flow Log 생성
+
+# VPC Flow Log 생성
 resource "aws_flow_log" "main" {
-  log_destination = "arn:aws:s3:::logrrr-vpc-flow-log-bucket"
-  log_destination_type = "s3"
-  traffic_type    = "ALL"
-  vpc_id          = "vpc-09edd77bad579d171"
+  log_destination       = var.s3_bucket_arn
+  log_destination_type  = "s3"
+  traffic_type          = "ALL"
+  vpc_id                = "vpc-09edd77bad579d171"
 }
 
 
@@ -48,8 +49,8 @@ resource "aws_iam_role_policy" "vpc_flow_log_policy" {
         ]
         
         Resource = [
-          "arn:aws:s3:::logrrr-vpc-flow-log-bucket",
-          "arn:aws:s3:::logrrr-vpc-flow-log-bucket/*"
+          var.s3_bucket_arn,
+          "${var.s3_bucket_arn}/*"
         ]
       },
     ]
