@@ -5,7 +5,7 @@
 ##############################################
 
 resource "aws_sqs_queue" "s3_event_queue" {
-    name  = "${var.project_name}.s3-event-queue" # 큐 이름 지정
+    name  = "${var.project_name}-s3-event-queue" # 큐 이름 지정
 }
 
 ##############################################
@@ -14,11 +14,11 @@ resource "aws_sqs_queue" "s3_event_queue" {
 
 data "aws_iam_policy_document" "s3_to_sqs_policy" {
   statement {
-    sid = "AllowS3TosendMessage"  # 정책 식별자
+    sid = "AllowS3ToSendMessage"  # 정책 식별자
     effect = "Allow"  # 허용 정책
     actions = ["sqs:SendMessage"] # SQS에 메시지 보내는 권한
     principals {
-      type  = "service" # 서비스 주체
+      type  = "Service" # 서비스 주체
       identifiers = ["s3.amazonaws.com"] # S3 서비스가 이 정책 대상
     }
     resources = [aws_sqs_queue.s3_event_queue.arn]  # 메시지를 받을 SQS 큐의 ARN
@@ -27,9 +27,9 @@ data "aws_iam_policy_document" "s3_to_sqs_policy" {
       test = "ArnLike"  # 조건 : 특정 S3 버킷에서만 허용
       variable  = "aws:SourceArn" # 비교할 조건 변수
       values = [  # 허용할 S3 버킷들
-        var.cloudtrail_s3_bucket_arn
-        var.guardduty_s3_bucket_arn
-        var.vpc_flow_log_s3_bucket_arn
+        var.cloudtrail_s3_bucket_arn,  # CloudTrail 로그가 저장되는 S3 버킷 ARN
+        var.guardduty_s3_bucket_arn,  # GuardDuty 결과가 저장되는 S3 버킷 ARN
+        var.vpc_flow_log_s3_bucket_arn  # VPC Flow 로그가
       ]
     }
   }
@@ -50,7 +50,7 @@ resource "aws_sqs_queue_policy" "s3_event_queue_policy" {
 
 resource "aws_s3_bucket_notification" "cloudtrail_notification" {
   bucket = var.cloudtrail_s3_bucket_id  # 대상 S3 버킷 ID
-
+  
   queue {
     queue_arn = aws_sqs_queue.s3_event_queue.arn  # 알림을 받을 SQS 큐의 ARN
     events    = ["s3:ObjectCreated:*"]  # 새 객체가 생성될 때마다 알림
