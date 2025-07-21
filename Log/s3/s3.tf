@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "vpc_flow_log_bucket" {
 
 # AWS GAURDDUTY 버킷
 resource "aws_s3_bucket" "guardduty_result_bucket" {
-  bucket = "${var.project_name}-gaurdduty-result-bucket"
+  bucket = "${var.project_name}-guardduty-result-bucket"
 }
 
 # AWS CLOUDTRAIL 버킷
