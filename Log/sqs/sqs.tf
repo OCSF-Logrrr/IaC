@@ -46,29 +46,25 @@ data "aws_iam_policy_document" "cloudtrail_to_sqs_policy" {
   }
 }
 
-# guardduty S3 버킷에서 SQS로 메시지를 보낼 수 있도록 허용하는 정책
-data "aws_iam_policy_document" "guardduty_to_sqs_policy" {
+# GuardDuty SQS 큐에 Lambda가 메시지를 받을 수 있도록 권한 부여
+data "aws_iam_policy_document" "guardduty_lambda_sqs_policy" {
   statement {
-    sid     = "AllowS3ToSendMessage"
+    sid     = "AllowLambdaToReceiveMessage"
     effect  = "Allow"
-    actions = ["sqs:SendMessage"]
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes"
+    ]
 
     principals {
       type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
+      identifiers = ["lambda.amazonaws.com"]
     }
 
     resources = [
-      aws_sqs_queue.guardduty_event_queue.arn
+      "arn:aws:sqs:ap-northeast-2:317164914199:guardduty-sqs"  # GuardDuty SQS 큐 ARN
     ]
-
-    condition {
-      test     = "ArnLike"
-      variable = "aws:SourceArn"
-      values   = [
-        var.guardduty_s3_bucket_arn  # GuardDuty S3 버킷 ARN
-      ]
-    }
   }
 }
 
@@ -109,7 +105,7 @@ resource "aws_sqs_queue_policy" "cloudtrail_event_queue_policy" {
 
 resource "aws_sqs_queue_policy" "guardduty_event_queue_policy" {
   queue_url = aws_sqs_queue.guardduty_event_queue.id
-  policy    = data.aws_iam_policy_document.guardduty_to_sqs_policy.json
+  policy    = data.aws_iam_policy_document.guardduty_lambda_sqs_policy.json
 }
 
 resource "aws_sqs_queue_policy" "vpc_flow_event_queue_policy" {
@@ -130,21 +126,6 @@ resource "aws_s3_bucket_notification" "cloudtrail_notification" {
   }
 
   depends_on = [aws_sqs_queue_policy.cloudtrail_event_queue_policy] # 정책 적용 후 알림 설정
-}
-
-############################################
-# GuardDuty S3 버킷에 이벤트 알림 설정
-############################################
-
-resource "aws_s3_bucket_notification" "guardduty_notification" {
-  bucket = var.guardduty_s3_bucket_id
-
-  queue {
-    queue_arn = aws_sqs_queue.guardduty_event_queue.arn
-    events    = ["s3:ObjectCreated:*"]
-  }
-
-  depends_on = [aws_sqs_queue_policy.guardduty_event_queue_policy]
 }
 
 ############################################

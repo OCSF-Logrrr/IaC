@@ -34,7 +34,7 @@ module "sqs"  {
 
   guardduty_s3_bucket_arn = module.s3.guardduty_result_bucket_arn
   guardduty_s3_bucket_id = module.s3.guardduty_result_bucket_id
-
+  
   vpc_flow_log_s3_bucket_arn = module.s3.vpc_flow_log_bucket_arn
   vpc_flow_log_s3_bucket_id = module.s3.vpc_flow_log_bucket_id
 }
@@ -60,4 +60,22 @@ module "filebeat_ec2" {
 
   vpc_flow_sqs_queue_url = module.sqs.vpc_flow_event_queue_url
   vpc_flow_sqs_queue_arn = module.sqs.vpc_flow_event_queue_arn  
+}
+
+# EventBridge
+module "eventbridge" {
+  source = "./eventbridge"
+
+  guardduty_sqs_queue_url = module.sqs.guardduty_event_queue_url
+  guardduty_sqs_queue_arn = module.sqs.guardduty_event_queue_arn
+
+}
+
+# Lambda
+module "lambda" {
+  source = "./lambda" 
+
+  guardduty_sqs_queue_url = module.sqs.guardduty_event_queue_url
+  guardduty_sqs_queue_arn = module.sqs.guardduty_event_queue_arn
+
 }
