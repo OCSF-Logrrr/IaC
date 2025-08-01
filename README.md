@@ -6,7 +6,6 @@
 
 _This repository contains the Terraform code that provisions AWS infrastructure for log collection and attack simulation, as part of the WHS 3th OCSF-based Security Log Integration and Analysis Project._
 
----
 <img width="1316" height="277" alt="AWS_infra" src="https://github.com/user-attachments/assets/161d0d60-718c-4004-83aa-f867042011e5" />
 
 ## Directory Structure
