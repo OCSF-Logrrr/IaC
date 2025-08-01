@@ -8,7 +8,7 @@ _This repository contains the Terraform code that provisions AWS infrastructure 
 
 <img width="1316" height="277" alt="AWS_infra" src="https://github.com/user-attachments/assets/161d0d60-718c-4004-83aa-f867042011e5" />
 
-## Directory Structure
+# Directory Structure
 
 ```bash
 IaC/
@@ -51,9 +51,9 @@ IaC/
 
 ---
 
-## Description of each directory
+# Description of each directory
 
-### CICD
+## CICD
 <img width="1000" alt="CICD_infra" src="https://github.com/user-attachments/assets/8827d716-3f00-4500-807c-3f7b679b0bc5" />
 
 **PHP-based web server CICD pipeline infrastructure**
@@ -65,16 +65,15 @@ Detailed infrastructure configurations for the web server and database server ca
 
 The PHP codebase is also available in the repository linked below.
 - [**CICD-Code**](https://github.com/OCSF-Logrrr/CICD-Code)
----
-### LAN
+
+## LAN
 <img width="600" alt="LAN_infra" src="https://github.com/user-attachments/assets/20eeb1d7-664f-4504-a462-c624c1290ceb" />
 
 **internal infrastructure**
 
 We designed attack scenarios exploiting AWS vulnerabilities and built an internal network—which should not be accessible in a real-world environment—on both Windows and Ubuntu systems. This environment was set up in a separate VPC from the previously mentioned CI/CD pipeline. The bastion server (Windows EC2) is placed in a public subnet, while the pivot, data, and database servers (Ubuntu EC2 instances) are located in private subnets. In this setup, we were able to collect Windows Event Logs, and the Ubuntu servers were configured with a vulnerable 20.04 version to generate logs from various CVE exploitation attempts. The internal infrastructure was used for the purposes of attack simulation and log collection.
 
----
-### Log
+## Log
 <img width="600" alt="Log_infra" src="https://github.com/user-attachments/assets/dff2323c-88bb-4327-af32-b34b00c16d3d" />
 
 **Log generation and collection infrastructure**
