@@ -1,8 +1,12 @@
 # IaC
 
+[![HCL](https://img.shields.io/badge/hcl-%23006BB6.svg?&style=for-the-badge&logo=hcl&logoColor=white)](https://github.com/hashicorp/hcl)
 [![Terraform](https://img.shields.io/badge/Terraform-1.0%2B-623CE4?logo=terraform&logoColor=white)](https://terraform.io/)
 [![AWS](https://img.shields.io/badge/AWS-Deployed-232F3E?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
 
+_This repository contains the Terraform code that provisions AWS infrastructure for log collection and attack simulation, as part of the WHS 3th OCSF-based Security Log Integration and Analysis Project._
+
+---
 
 ```bash
 IaC/
