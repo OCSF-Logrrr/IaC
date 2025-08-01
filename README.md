@@ -1,5 +1,9 @@
 # IaC
 
+[![Terraform](https://img.shields.io/badge/Terraform-1.0%2B-623CE4?logo=terraform&logoColor=white)](https://terraform.io/)
+[![AWS](https://img.shields.io/badge/AWS-Deployed-232F3E?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+
+
 ```bash
 IaC/
 ├── CICD/  #PHP-based web server CICD pipeline infrastructure
