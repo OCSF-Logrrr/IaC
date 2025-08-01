@@ -76,7 +76,7 @@ We designed attack scenarios exploiting AWS vulnerabilities and built an interna
 
 **Log generation and collection infrastructure**
 
-Logs generated inside EC2 instances—such as those from Nginx and MySQL—were forwarded to a broker server using agents like Filebeat installed within the EC2s. AWS logs such as CloudTrail, VPC Flow Logs, and GuardDuty required additional configuration to be collected with Filebeat. Specifically, when CloudTrail and VPC Flow Logs are generated, they are stored in an S3 bucket, which Filebeat then monitors and collects. GuardDuty logs are sent to Kafka via a Lambda function.
+Logs generated inside EC2 instances—such as those from Nginx and MySQL—were forwarded to a broker server using agents like Filebeat installed within the EC2s. AWS logs such as CloudTrail, VPC Flow Logs, and GuardDuty required additional configuration to be collected with Filebeat. Specifically, when CloudTrail and VPC Flow Logs are generated, they are stored in an S3 bucket, which Filebeat then monitors and collects. GuardDuty logs are sent to Kafka via a Lambda function. GuardDuty findings flow through EventBridge and SQS to a Lambda function, which then sends them to Kafka.
 
 ---
 IaC Code Author : @Pandyo ,@BISHOP1027
