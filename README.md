@@ -7,6 +7,7 @@
 _This repository contains the Terraform code that provisions AWS infrastructure for log collection and attack simulation, as part of the WHS 3th OCSF-based Security Log Integration and Analysis Project._
 
 ---
+<img width="1316" height="277" alt="AWS_infra" src="https://github.com/user-attachments/assets/161d0d60-718c-4004-83aa-f867042011e5" />
 
 ## Directory Structure
 
@@ -48,3 +49,30 @@ IaC/
 
 24 directories, 81 files
 ```
+
+---
+
+## Description of each directory
+
+### CICD
+<img width="1224" height="505" alt="CICD_infra" src="https://github.com/user-attachments/assets/8827d716-3f00-4500-807c-3f7b679b0bc5" />
+
+**PHP-based web server CICD pipeline infrastructure**
+
+We have designed a CI/CD pipeline with the goal of collecting logs generated from operating web and database servers on Ubuntu Linux using AWS services. The pipeline is triggered whenever PHP code in the GitHub repository is updated, which initiates the workflow through AWS CodePipeline. The updated PHP code is stored in an S3 bucket for CodeBuild, where the build process is executed according to predefined steps. Once the build completes, CodeDeploy performs an in-place deployment, updating the current environment with the new code. After this process, the CodePipeline finishes and the web server is updated with the latest code.
+
+Detailed infrastructure configurations for the web server and database server can be found in the repository below.
+- [**Linux**](https://github.com/OCSF-Logrrr/Linux)
+
+The PHP codebase is also available in the repository linked below.
+- [**CICD-Code**](https://github.com/OCSF-Logrrr/CICD-Code)
+
+### LAN
+<img width="776" height="513" alt="LAN_infra" src="https://github.com/user-attachments/assets/20eeb1d7-664f-4504-a462-c624c1290ceb" />
+
+**internal infrastructure**
+
+### Log
+<img width="859" height="513" alt="Log_infra" src="https://github.com/user-attachments/assets/dff2323c-88bb-4327-af32-b34b00c16d3d" />
+
+**Log generation and collection infrastructure**
