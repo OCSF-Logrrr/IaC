@@ -66,12 +66,13 @@ Detailed infrastructure configurations for the web server and database server ca
 
 The PHP codebase is also available in the repository linked below.
 - [**CICD-Code**](https://github.com/OCSF-Logrrr/CICD-Code)
-
+---
 ### LAN
 <img width="776" height="513" alt="LAN_infra" src="https://github.com/user-attachments/assets/20eeb1d7-664f-4504-a462-c624c1290ceb" />
 
 **internal infrastructure**
 
+---
 ### Log
 <img width="859" height="513" alt="Log_infra" src="https://github.com/user-attachments/assets/dff2323c-88bb-4327-af32-b34b00c16d3d" />
 
