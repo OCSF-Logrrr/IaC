@@ -8,6 +8,8 @@ _This repository contains the Terraform code that provisions AWS infrastructure 
 
 ---
 
+## Directory Structure
+
 ```bash
 IaC/
 ├── CICD/  #PHP-based web server CICD pipeline infrastructure
