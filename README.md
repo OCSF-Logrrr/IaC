@@ -49,8 +49,6 @@ IaC/
 24 directories, 81 files
 ```
 
----
-
 # Description of each directory
 
 ## CICD
