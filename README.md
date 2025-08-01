@@ -54,7 +54,7 @@ IaC/
 ## Description of each directory
 
 ### CICD
-<img width="700" alt="CICD_infra" src="https://github.com/user-attachments/assets/8827d716-3f00-4500-807c-3f7b679b0bc5" />
+<img width="900" alt="CICD_infra" src="https://github.com/user-attachments/assets/8827d716-3f00-4500-807c-3f7b679b0bc5" />
 
 **PHP-based web server CICD pipeline infrastructure**
 
