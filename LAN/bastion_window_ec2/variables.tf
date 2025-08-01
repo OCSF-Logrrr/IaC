@@ -25,3 +25,4 @@ variable "key_name" {
   default     = "whs_ocsf_logrrr"
   description = "key_name"
 }
+
