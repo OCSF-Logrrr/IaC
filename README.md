@@ -71,8 +71,12 @@ The PHP codebase is also available in the repository linked below.
 
 **internal infrastructure**
 
+We designed attack scenarios exploiting AWS vulnerabilities and built an internal network—which should not be accessible in a real-world environment—on both Windows and Ubuntu systems. This environment was set up in a separate VPC from the previously mentioned CI/CD pipeline. The bastion server (Windows EC2) is placed in a public subnet, while the pivot, data, and database servers (Ubuntu EC2 instances) are located in private subnets. In this setup, we were able to collect Windows Event Logs, and the Ubuntu servers were configured with a vulnerable 20.04 version to generate logs from various CVE exploitation attempts. The internal infrastructure was used for the purposes of attack simulation and log collection.
+
 ---
 ### Log
 <img width="600" alt="Log_infra" src="https://github.com/user-attachments/assets/dff2323c-88bb-4327-af32-b34b00c16d3d" />
 
 **Log generation and collection infrastructure**
+
+Logs generated inside EC2 instances—such as those from Nginx and MySQL—were forwarded to a broker server using agents like Filebeat installed within the EC2s. AWS logs such as CloudTrail, VPC Flow Logs, and GuardDuty required additional configuration to be collected with Filebeat. Specifically, when CloudTrail and VPC Flow Logs are generated, they are stored in an S3 bucket, which Filebeat then monitors and collects. GuardDuty logs are sent to Kafka via a Lambda function.
