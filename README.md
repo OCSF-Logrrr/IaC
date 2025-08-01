@@ -54,7 +54,7 @@ IaC/
 ## Description of each directory
 
 ### CICD
-<img width="1224" height="505" alt="CICD_infra" src="https://github.com/user-attachments/assets/8827d716-3f00-4500-807c-3f7b679b0bc5" />
+<img width="700" alt="CICD_infra" src="https://github.com/user-attachments/assets/8827d716-3f00-4500-807c-3f7b679b0bc5" />
 
 **PHP-based web server CICD pipeline infrastructure**
 
@@ -67,12 +67,12 @@ The PHP codebase is also available in the repository linked below.
 - [**CICD-Code**](https://github.com/OCSF-Logrrr/CICD-Code)
 ---
 ### LAN
-<img width="776" height="513" alt="LAN_infra" src="https://github.com/user-attachments/assets/20eeb1d7-664f-4504-a462-c624c1290ceb" />
+<img width="700" alt="LAN_infra" src="https://github.com/user-attachments/assets/20eeb1d7-664f-4504-a462-c624c1290ceb" />
 
 **internal infrastructure**
 
 ---
 ### Log
-<img width="859" height="513" alt="Log_infra" src="https://github.com/user-attachments/assets/dff2323c-88bb-4327-af32-b34b00c16d3d" />
+<img width="700" alt="Log_infra" src="https://github.com/user-attachments/assets/dff2323c-88bb-4327-af32-b34b00c16d3d" />
 
 **Log generation and collection infrastructure**
