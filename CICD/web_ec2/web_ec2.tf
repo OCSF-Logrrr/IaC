@@ -1,5 +1,61 @@
 #web_ec2.tf
 
+#EC2용 역할 생성
+resource "aws_iam_role" "ec2_role" {
+  name = "${var.project_name}EC2Role" #역할 이름
+
+  assume_role_policy = jsonencode({ #ec2에서 사용 가능
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+#고객관리형 정책
+resource "aws_iam_policy" "ec2_policy" {
+  name        = "${var.project_name}EC2Role"
+  description = "EC2, S3, SSM"
+
+  policy = jsonencode({
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"cloudwatch:*",
+				"s3:*",
+				"ssm:*",
+				"codedeploy:*",
+				"ec2messages:*",
+				"ec2:*",
+				"ssmmessages:*"
+			],
+			"Resource": "*"
+		}
+	]
+  })
+}
+
+#역할에 정책 연결
+resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.ec2_policy.arn
+}
+
+#EC2 IAM 연결
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "${var.project_name}EC2Role"
+  role = aws_iam_role.ec2_role.name
+}
+
 ###########################################################################################
 ############################### Web Server EC2 ############################################
 ###########################################################################################
@@ -48,25 +104,25 @@ resource "aws_instance" "web_server_instance" {
     throughput            = 125 #처리량
   }
 
+  iam_instance_profile                 = aws_iam_instance_profile.ec2_profile.name #위에서 생성한 IAM 역할 사용
   instance_initiated_shutdown_behavior = "stop" #EC2 종료 시 중지
 
   metadata_options { #인스턴스 메타데이터 옵션
     http_endpoint               = "enabled" #메타데이터 액세스 기능 활성화
     http_protocol_ipv6          = "disabled" #메타데이터 IPv6 비활성화
-    http_tokens                 = "required" #버전 V2만 사용하도록 토큰 필요 여부 활성화
+    http_tokens                 = "optional" #V1 허용
     http_put_response_hop_limit = 2 #홉 수 제한
     instance_metadata_tags      = "disabled" #메타데이터에서 인스턴스 태그 접근 비활성화
   }
 
   user_data = templatefile("${path.module}/user_data.tpl",{
-    eip = aws_eip.web_server_eip.public_ip
-    domain_name = var.domain_name
-    nameservers = var.nameservers
-    enable_reverse_zone = var.enable_reverse_zone
-    reverse_zone_name   = var.reverse_zone_name
-    reverse_zone_file   = var.reverse_zone_file
     ip_port = var.ip_port
+    db_ec2_public_ip = var.db_ec2_public_ip
   })
+
+  tags = {
+    Name = "${var.project_name}-web-instance"
+  }
 }
 
 #인스턴스에 eip 연결
@@ -74,3 +130,21 @@ resource "aws_eip_association" "web_server_eip_association" {
   instance_id   = aws_instance.web_server_instance.id
   allocation_id = aws_eip.web_server_eip.id
 }
+
+
+resource "aws_route53_zone" "this" {
+  name = "logrrrrrrr.site"
+}
+
+#A 레코드 생성
+resource "aws_route53_record" "www" {
+  zone_id = aws_route53_zone.this.zone_id
+  name    = var.domain_name
+  type    = "A"
+  ttl     = 300
+  records = [aws_eip.web_server_eip.public_ip]
+
+  depends_on = [aws_eip.web_server_eip]
+}
+
+#가비아에서 구매한 도메인으로 위의 과정이 실행된 후 가비아에서 네임서버 변경을 진행해주어야 함

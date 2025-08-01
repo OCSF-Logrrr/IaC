@@ -28,3 +28,8 @@ output "web_eip_ec2_association" {
   value       = aws_eip.web_server_eip.id
   description = "EIP EC2 Association"
 }
+
+output "ec2_profile" {
+  value       = aws_iam_instance_profile.ec2_profile.name
+  description = "aws_iam_instance_profile"
+}

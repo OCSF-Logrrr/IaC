@@ -20,6 +20,11 @@ variable "public_subnet_id_02" {
   description = "public_subnet_id_02"
 }
 
+variable "ec2_profile" {
+  type        = string
+  description = "ec2_profile"
+}
+
 variable "key_name" {
   type        = string
   default     = "whs_ocsf_logrrr"

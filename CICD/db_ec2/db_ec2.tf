@@ -48,6 +48,7 @@ resource "aws_instance" "db_server_instance" {
     throughput            = 125 #처리량
   }
 
+  iam_instance_profile                 = var.ec2_profile #위에서 생성한 IAM 역할 사용
   instance_initiated_shutdown_behavior = "stop" #EC2 종료 시 중지
 
   metadata_options { #인스턴스 메타데이터 옵션
@@ -61,6 +62,10 @@ resource "aws_instance" "db_server_instance" {
   user_data = templatefile("${path.module}/user_data.tpl", {
     ip_port = var.ip_port
   })
+
+  tags = {
+    Name = "${var.project_name}-db-instance"
+  }
 }
 
 #인스턴스에 eip 연결

@@ -23,101 +23,6 @@ sudo ufw enable
 #rsyslog 재시작
 systemctl restart rsyslog
 
-#BIND9 설치
-sudo apt-get install bind9 -y
-
-#BIND9 Zone 파일 생성
-cat << 'EOF' > /etc/bind/db.${domain_name}.zone
-$TTL 604800
-@   IN  SOA  ${nameservers[0]}.${domain_name}. root.${domain_name}. (
-            2 604800 86400 2419200 604800 )
-;
-@ IN A ${eip}
-%{ for ns in nameservers ~}
-@ IN NS ${ns}.${domain_name}.
-${ns} IN A ${eip}
-%{ endfor ~}
-EOF
-
-#BIND9 Zone 파일 등록
-cat << 'EOF' >> /etc/bind/named.conf.default-zones
-zone "${domain_name}" {
-        type master;
-        file "/etc/bind/db.${domain_name}.zone";
-};
-%{ if enable_reverse_zone ~}
-zone "${reverse_zone_name}" {
-        type master;
-        file "/etc/bind/zones/${reverse_zone_file}";
-};
-%{ endif ~}
-EOF
-
-#BIND9 Options 파일 설정
-cat << 'EOF' > /etc/bind/named.conf.options
-options {
-        directory "/var/cache/bind";
-
-        // If there is a firewall between you and nameservers you want
-        // to talk to, you may need to fix the firewall to allow multiple
-        // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
-
-        // If your ISP provided one or more IP addresses for stable
-        // nameservers, you probably want to use them as forwarders.
-        // Uncomment the following block, and insert the addresses replacing
-        // the all-0's placeholder.
-
-        forwarders {
-                8.8.8.8;
-        };
-
-        allow-query { any; };
-        allow-query-cache { any; };
-
-        //========================================================================
-        // If BIND logs error messages about the root key being expired,
-        // you will need to update your keys.  See https://www.isc.org/bind-keys
-        //========================================================================
-        dnssec-validation auto;
-
-        listen-on-v6 { any; };
-};
-EOF
-
-#BIND9 로깅 디렉토리 생성
-sudo mkdir /var/log/named
-
-#BIND9 로깅 파일 생성
-sudo touch /var/log/named/query.log
-
-#BIND9 로깅 파일 생성
-sudo touch /var/log/named/named.log
-
-#BIND9 로깅 파일 권한 수정
-sudo chown -R bind:bind /var/log/named
-
-#BIND9 로깅 설정
-cat << 'EOF' > /etc/bind/named.conf.local
-logging {
-    channel querylog {
-        file "/var/log/named/query.log" versions 10 size 10m;
-        severity info;
-        print-time yes;
-    };
-    channel default_log {
-        file "/var/log/named/named.log" versions 10 size 10m;
-        severity info;
-        print-time yes;
-    };
-    category queries { querylog; };
-    category default { default_log; };
-    category general { default_log; };
-};
-EOF
-
-#BIND9 재시작
-sudo systemctl restart bind9
-
 #Nginx 설치
 sudo apt install -y nginx
 
@@ -128,7 +33,7 @@ server {
         listen [::]:80 default_server;
 
         root /var/www/html/nginx;
-
+        index index.html index.htm index.nginx-debian.html;
         location / {
                 proxy_pass http://127.0.0.1:8080; #here
                 proxy_set_header Host $host; # here
@@ -143,24 +48,21 @@ server {
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection 'upgrade';
                 proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_cache_bypass $http_upgrade;
         }
 
         location /webapi/ {
-        proxy_pass http://127.0.0.1:8080/;
+                proxy_pass http://127.0.0.1:8080/webapi/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Proto $scheme;
-
-                rewrite ^/webapi/(.*)$ /$1 break;
         }
-
 
         location /css/ {
                 root /var/www/html/apache2;
         }
-
 
         location ~ \.php$ {
                 root /var/www/html/apache2;
@@ -189,23 +91,48 @@ Listen 8080
 </IfModule>
 EOF
 
+cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
+<VirtualHost *:8080>
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html/apache2
+	
+	<Directory /var/www/html/apache2>
+		Require all granted
+	</Directory>
+	
+	<FilesMatch \.php$>
+    		SetHandler "proxy:unix:/run/php/php8.3-fpm.sock|fcgi://localhost/"
+	</FilesMatch>
+
+	ErrorLog /var/log/apache2/error.log
+	CustomLog /var/log/apache2/access.log combined
+</VirtualHost>
+EOF
+
 #Apache2 재시작
-systemctl restart apache2
+sudo systemctl restart apache2
 
 #PHP 로깅 설정
-sed -i 's/^;log_errors = .*/log_errors = On/' /etc/php/7.4/apache2/php.ini
-echo "error_log = /var/log/php_errors.log" >> /etc/php/7.4/apache2/php.ini
+sed -i 's/^;log_errors = .*/log_errors = On/' /etc/php/8.3/apache2/php.ini
+echo "error_log = /var/log/php_errors.log" >> /etc/php/8.3/apache2/php.ini
 touch /var/log/php_errors.log
 chmod 644 /var/log/php_errors.log
 
 #Apache 게시판 코드 디렉토리 생성
 cd /tmp
-git clone https://github.com/OCSF-Logrrr/Linux.git
+git clone https://github.com/OCSF-Logrrr/CICD-Code
 mkdir -p /var/www/html/apache2
-mkdir -p /var/www/html/apache2/files
-cp -r /tmp/Linux/Web_Code/Board1/* /var/www/html/apache2/
+cp -r /tmp/CICD-Code/apache2/* /var/www/html/apache2/
+mkdir -p /var/www/html/apache2/webapi/files
 chown -R www-data:www-data /var/www/html/apache2
 chmod -R 755 /var/www/html/apache2
+
+cd /var/www/html/apache2
+apt install composer -y
+COMPOSER_ALLOW_SUPERUSER=1 composer require vlucas/phpdotenv
+
+#Apache2 재시작
+systemctl restart apache2
 
 #Modsecurity 설치
 apt install -y apache2 libapache2-mod-security2
@@ -239,10 +166,25 @@ echo 'IncludeOptional /etc/modsecurity/coreruleset/rules/*.conf' >> /etc/modsecu
 systemctl restart apache2
 
 #Node.js 설치 (node.js, npm 특정 버전 설치)
-apt install -y nodejs npm
-cd /opt
-git clone https://github.com/snoopysecurity/dvws-node chatapi
-cd chatapi
+cd /tmp
+git clone https://github.com/snoopysecurity/dvws-node
+mkdir -p /var/www/html/nginx
+cp -r /tmp/dvws-node/. /var/www/html/nginx
+chown -R ubuntu:ubuntu /var/www/html/nginx
+cd /var/www/html/nginx
+cat <<EOF > /var/www/html/nginx/.env
+EXPRESS_JS_PORT=3000
+XML_RPC_PORT=9090
+GRAPHQL_PORT=4000
+JWT_SECRET=access
+MONGO_LOCAL_CONN_URL=mongodb://${db_ec2_public_ip}:27017/test
+MONGO_DB_NAME=test
+SQL_LOCAL_CONN_URL=${db_ec2_public_ip}
+SQL_DB_NAME=board
+SQL_USERNAME=root
+SQL_PASSWORD=1234
+LOG_LEVEL=info
+EOF
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 source "$NVM_DIR/nvm.sh"
@@ -250,7 +192,10 @@ nvm install 16.19.0
 nvm use 16.19.0
 nvm alias default 16.19.0
 npm install
-nohup node app.js > /var/log/chatapi.log 2>&1 &
+
+#chatapi 애플리케이션 pm2로 실행
+npm install -g pm2
+pm2 start app.js --name dvws-api
 
 #UFW 방화벽 설정
 sudo ufw allow 22/tcp
@@ -270,6 +215,18 @@ curl -o /etc/suricata/rules/SQL_Injection.rules https://raw.githubusercontent.co
 curl -o /etc/suricata/rules/XSS.rules https://raw.githubusercontent.com/OCSF-Logrrr/Linux/main/Suricata/rules/XSS.rules
 
 sudo systemctl restart suricata
+
+#auditd 설치
+sudo apt-get install auditd audispd-plugins
+
+sudo systemctl enable auditd
+sudo systemctl start auditd
+
+#auditd Rules 추가
+sudo auditctl -a always,exit -F path=/usr/bin/curl -F perm=x -k webshell
+sudo filebeat modules enable auditd
+
+
 
 #Filebeat 설치
 wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.6.2-amd64.deb

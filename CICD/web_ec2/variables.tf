@@ -26,38 +26,25 @@ variable "key_name" {
   description = "key_name"
 }
 
+variable "ip_port" {
+  type        = string
+  default     = "221.144.36.127:9092"
+  description = "ip_port"
+}
+
 variable "domain_name" {
   type        = string
-  default     = "test.logrrrrrrr.site"
+  default     = "logrrrrrrr.site"
   description = "domain_name"
 }
 
-variable "nameservers" {
-  type        = list(string)
-  default     = ["ns", "ns2"]
-  description = "NS hostname list"
-}
-
-variable "enable_reverse_zone" {
-  type        = bool
-  default     = true
-  description = "Enable reverse DNS zone setup"
-}
-
-variable "reverse_zone_name" {
+variable "zone_id" {
   type        = string
-  default     = "37.3.in-addr.arpa"
-  description = "Reverse zone name (e.g., 37.3.in-addr.arpa)"
+  default     = "Z0507475345E5EYBCZF30"
+  description = "Hosting Zone id"
 }
 
-variable "reverse_zone_file" {
+variable "db_ec2_public_ip" {
   type        = string
-  default     = "db.3.37"
-  description = "Reverse zone file name (e.g., db.3.37)"
-}
-
-variable "ip_port" {
-  type        = string
-  default     = ""
-  description = "ip_port"
+  description = "db_ec2_public_ip"
 }
